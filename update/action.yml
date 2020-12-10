@@ -6,8 +6,11 @@ inputs:
     description: "Github authentication token"
     required: true
   github-needs:
-    description: '"needs" object from github actions as JSON format'
-    default: ${{ toJson(needs) }}
+    description: >-
+      "needs" object from github actions as JSON format.
+
+      MUST be passed as  ${{ toJson(needs) }}
+    required: true
   context:
     description: "Github status context"
     default: continuous-integration/github-actions/status
