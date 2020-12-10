@@ -10,7 +10,7 @@ inputs:
     default: continuous-integration/github-actions/status
   target-url:
     description: "URL to include in the status"
-    required: false
+    default: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
 
 outputs:
   commit_status_sha:
