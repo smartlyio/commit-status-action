@@ -1,0 +1,81 @@
+name: 'Create pending github commit statuses'
+description: Update a pending commit status context with the final result
+
+inputs:
+  github-token:
+    description: "Github authentication token"
+    required: true
+  context:
+    description: "Github status context"
+    default: continuous-integration/github-actions/status
+  target-url:
+    description: "URL to include in the status"
+    required: false
+  sha:
+    description: >-
+      The git commit sha to attach the status to.  This should be
+      provided from the `commit_status_sha` output of the create
+      action from this same repository.
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get final commit status
+      id: commit_status
+      shell: bash
+      run: |
+        cat > update_commit_status-needs.json <<EOFNEEDS
+        ${{ toJson(needs) }}
+        EOFNEEDS
+        
+        function countbyStatus() {
+          local status="$1"
+          local count=0
+          jq '. | with_entries(select(.value.result == "'"$status"'"))' <update_commit_status-needs.json 1>&2
+          count="$(jq '. | with_entries(select(.value.result == "'"$status"'")) | length' <update_commit_status-needs.json)"
+          echo "$count"
+        }
+        successes="$(countbyStatus "success")"
+        failures="$(countbyStatus "failure")"
+        errors="$(countbyStatus "skipped")"
+        cancelled="$(countbyStatus "cancelled")"
+        if [[ "$cancelled" -gt 0 ]]; then
+          final_result="error"
+          description='Build ended as "error" with one or more skipped cancelled stages'
+        elif [[ "$errors" -gt 0 ]]; then
+          final_result="error"
+          description='Build ended as "error" with one or more skipped stages'
+        elif [[ "$failures" -gt 0 ]]; then
+          final_result="failure"
+          description='Build ended as "failed" with one or more failed stages'
+        elif [[ "$successes" -eq 0 ]]; then
+          final_result="error"
+          description="Build encountered unknown error with no successful stages reported"
+        else
+          final_result="success"
+          description="Build succeeded"
+        fi
+        echo ::set-output name=status::"$final_result"
+        echo ::set-output name=description::"$description"
+
+    - name: Update commit status
+      shell: bash
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        TARGET_URL: ${{ inputs.target-url }}
+        COMMIT_STATUS_SHA: ${{ inputs.sha }}
+        DESCRIPTION: ${{ steps.commit_status.outputs.description }}
+        CONTEXT: ${{ inputs.context }}
+        STATUS: ${{ steps.commit_status.outputs.status }}
+      run: |
+        declare -a ARGS
+        if [[ -n "$TARGET_URL" ]]; then
+            ARGS=("-f" "target_url" "$TARGET_URL")
+        fi
+        
+        gh api "/repos/${GITHUB_REPOSITORY}/statuses/${COMMIT_STATUS_SHA}" \
+           -XPOST \
+           -f state="$STATUS" \
+           -f description="$DESCRIPTION" \
+           -f context="$CONTEXT" \
+           "${ARGS[@]}"
