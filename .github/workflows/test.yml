@@ -1,0 +1,60 @@
+name: Test commit-status-action
+
+on:
+  pull_request:
+    branches: [master]
+  push:
+    branches: [master]
+
+jobs:
+  create_status:
+    runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.commit_status.outputs.commit_status_sha }}
+    steps:
+      - name: Create pending status
+        id: commit_status
+        uses: ./create
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  shellcheck:
+    # Use newer os for more up-to-date shellcheck
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - name: Run shellcheck on .sh and .bash files files
+        run: |
+          find . -name '*.sh' -exec shellcheck -s bash '{}' \+
+          find . -name '*.bash' -exec shellcheck -s bash '{}' \+
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-ruby@v1
+        with:
+          ruby-version: "2.7"
+      - name: Install kojo
+        run: gem install kojo
+      - run: make
+      - name: Check for changes
+        run: |
+          git status
+          git_changes="$(git status --porcelain || true)"
+          # If the output is not empty, there are changes; fail the action
+          if [ -n "$git_changes" ]; then
+              echo "Changes found; build the action with 'make' and commit the changes"
+              exit 1
+          fi
+
+  finalize_status:
+    runs-on: ubuntu-latest
+    needs: [shellcheck, build, create_status]
+    if: ${{ always() }}
+    steps:
+      - name: Create pending status
+        uses: ./update
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          sha: ${{ needs.create_status.outputs.sha }}
