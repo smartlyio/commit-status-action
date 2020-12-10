@@ -8,9 +8,6 @@ inputs:
   context:
     description: "Github status context"
     default: continuous-integration/github-actions/status
-  description:
-    description: "Description for the status"
-    required: true
   target-url:
     description: "URL to include in the status"
     required: false
@@ -34,7 +31,7 @@ runs:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         TARGET_URL: ${{ inputs.target-url }}
         COMMIT_STATUS_SHA: ${{ steps.commit_status_sha.outputs.sha }}
-        DESCRIPTION: ${{ inputs.description }}
+        DESCRIPTION: "Build status is pending"
         CONTEXT: ${{ inputs.context }}
       run: |
         @import ../script-import-helper (script_name: "create-commit-status.bash")
