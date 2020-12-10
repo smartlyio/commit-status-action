@@ -12,6 +12,7 @@ jobs:
     outputs:
       sha: ${{ steps.commit_status.outputs.commit_status_sha }}
     steps:
+      - uses: actions/checkout@v2
       - name: Create pending status
         id: commit_status
         uses: ./create
@@ -53,6 +54,7 @@ jobs:
     needs: [shellcheck, build, create_status]
     if: ${{ always() }}
     steps:
+      - uses: actions/checkout@v2
       - name: Create pending status
         uses: ./update
         with:
