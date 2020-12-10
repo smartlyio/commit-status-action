@@ -1,0 +1,40 @@
+name: 'Create pending github commit statuses'
+description: Create a github commit status context in the pending state
+
+inputs:
+  github-token:
+    description: "Github authentication token"
+    required: true
+  context:
+    description: "Github status context"
+    default: continuous-integration/github-actions/status
+  description:
+    description: "Description for the status"
+    required: true
+  target-url:
+    description: "URL to include in the status"
+    required: false
+
+outputs:
+  commit_status_sha:
+    description: "The commit sha that the status is attached to"
+    value: ${{ steps.commit_status_sha.outputs.sha }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Determine commit to put the build status on
+      id: commit_status_sha
+      shell: bash
+      run: |
+        @import script-import-helper (script_name: "get-commit-sha.bash")
+    - name: Create commit status
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        TARGET_URL: ${{ inputs.target-url }}
+        COMMIT_STATUS_SHA: ${{ steps.commit_status_sha.outputs.sha }}
+        DESCRIPTION: ${{ inputs.description }}
+        CONTEXT: ${{ inputs.context }}
+      run: |
+        @import script-import-helper (script_name: "create-commit-status.bash")
