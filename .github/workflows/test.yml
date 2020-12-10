@@ -28,6 +28,7 @@ jobs:
         run: |
           find . -name '*.sh' -exec shellcheck -s bash '{}' \+
           find . -name '*.bash' -exec shellcheck -s bash '{}' \+
+          false
 
   build:
     runs-on: ubuntu-latest
