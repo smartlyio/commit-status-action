@@ -1,5 +1,5 @@
 cat > update_commit_status-needs.json <<EOFNEEDS
-${{ toJson(needs) }}
+${GITHUB_NEEDS}
 EOFNEEDS
 
 function countbyStatus() {

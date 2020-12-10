@@ -5,6 +5,9 @@ inputs:
   github-token:
     description: "Github authentication token"
     required: true
+  github-needs:
+    description: '"needs" object from github actions as JSON format'
+    default: ${{ toJson(needs) }}
   context:
     description: "Github status context"
     default: continuous-integration/github-actions/status
@@ -24,6 +27,8 @@ runs:
     - name: Get final commit status
       id: commit_status
       shell: bash
+      env:
+        GITHUB_NEEDS: ${{ inputs.github-needs }}
       run: |
         @import ../script-import-helper (script_name: "get-commit-status.bash")
     - name: Update commit status
