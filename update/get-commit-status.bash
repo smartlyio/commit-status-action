@@ -9,15 +9,19 @@ function countbyStatus() {
   count="$(jq '. | with_entries(select(.value.result == "'"$status"'")) | length' <update_commit_status-needs.json)"
   echo "$count"
 }
+function jobsWithStatus() {
+    local status="$1"
+    jq -r '. | to_entries | .[] | select(.value.result == "'"$status"'") | .key' <update_commit_status-needs.json | rt $'\n' ' '
+}
 successes="$(countbyStatus "success")"
 failures="$(countbyStatus "failure")"
 cancelled="$(countbyStatus "cancelled")"
 if [[ "$cancelled" -gt 0 ]]; then
   final_result="error"
-  description='Build ended as "error" with one or more cancelled stages'
+  description="Build ended as 'error' with one or more cancelled stages: $(jobsWithStatus "cancelled")"
 elif [[ "$failures" -gt 0 ]]; then
   final_result="failure"
-  description='Build ended as "failed" with one or more failed stages'
+  description="Build ended as 'failed' with one or more failed stages: $(jobsWithStatus "failure")"
 elif [[ "$successes" -eq 0 ]]; then
   final_result="error"
   description="Build encountered unknown error with no successful stages reported"
