@@ -11,14 +11,10 @@ function countbyStatus() {
 }
 successes="$(countbyStatus "success")"
 failures="$(countbyStatus "failure")"
-errors="$(countbyStatus "skipped")"
 cancelled="$(countbyStatus "cancelled")"
 if [[ "$cancelled" -gt 0 ]]; then
   final_result="error"
-  description='Build ended as "error" with one or more skipped cancelled stages'
-elif [[ "$errors" -gt 0 ]]; then
-  final_result="error"
-  description='Build ended as "error" with one or more skipped stages'
+  description='Build ended as "error" with one or more cancelled stages'
 elif [[ "$failures" -gt 0 ]]; then
   final_result="failure"
   description='Build ended as "failed" with one or more failed stages'
