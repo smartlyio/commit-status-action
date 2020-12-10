@@ -11,7 +11,10 @@ function countbyStatus() {
 }
 function jobsWithStatus() {
     local status="$1"
-    jq -r '. | to_entries | .[] | select(.value.result == "'"$status"'") | .key' <update_commit_status-needs.json | rt $'\n' ' '
+    jq -r '. | to_entries | .[] | select(.value.result == "'"$status"'") | .key' <update_commit_status-needs.json | tr $'\n' ' '
+}
+function jobsStatuses() {
+    jq -r '. | to_entries | .[] | .key + ": " .value.result' <update_commit_status-needs.json | tr $'\n' '; ' | sed 's/; $//'
 }
 successes="$(countbyStatus "success")"
 failures="$(countbyStatus "failure")"
@@ -24,7 +27,7 @@ elif [[ "$failures" -gt 0 ]]; then
   description="Build ended as 'failed' with one or more failed stages: $(jobsWithStatus "failure")"
 elif [[ "$successes" -eq 0 ]]; then
   final_result="error"
-  description="Build encountered unknown error with no successful stages reported"
+  description="Build encountered unknown error with no successful stages reported. Job statuses are $(jobsStatuses)"
 else
   final_result="success"
   description="Build succeeded"
