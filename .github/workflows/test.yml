@@ -55,7 +55,7 @@ jobs:
     if: ${{ always() }}
     steps:
       - uses: actions/checkout@v2
-      - name: Create pending status
+      - name: Update commit status
         uses: ./update
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}

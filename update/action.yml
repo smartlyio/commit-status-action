@@ -61,6 +61,7 @@ runs:
 
     - name: Update commit status
       shell: bash
+      env:
         GITHUB_TOKEN: ${{ inputs.github-token }}
         TARGET_URL: ${{ inputs.target-url }}
         COMMIT_STATUS_SHA: ${{ inputs.sha }}
