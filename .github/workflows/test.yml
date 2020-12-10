@@ -28,10 +28,10 @@ jobs:
         run: |
           find . -name '*.sh' -exec shellcheck -s bash '{}' \+
           find . -name '*.bash' -exec shellcheck -s bash '{}' \+
-          false
 
   build:
     runs-on: ubuntu-latest
+    if: false
     steps:
       - uses: actions/checkout@v2
       - uses: actions/setup-ruby@v1
