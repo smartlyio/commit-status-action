@@ -1,0 +1,47 @@
+name: 'Create pending github commit statuses'
+description: Update a pending commit status context with the final result
+
+inputs:
+  github-token:
+    description: "Github authentication token"
+    required: true
+  github-needs:
+    description: >-
+      "needs" object from github actions as JSON format.
+
+      MUST be passed as the github templated toJson(needs)
+    required: true
+  context:
+    description: "Github status context"
+    default: continuous-integration/github-actions/status
+  target-url:
+    description: "URL to include in the status"
+    default: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  sha:
+    description: >-
+      The git commit sha to attach the status to.  This should be
+      provided from the `commit_status_sha` output of the create
+      action from this same repository.
+    required: true
+
+runs:
+  using: "composite"
+  steps:
+    - name: Get final commit status
+      id: commit_status
+      shell: bash
+      env:
+        GITHUB_NEEDS: ${{ inputs.github-needs }}
+      run: |
+        @import ../script-import-helper (script_name: "get-commit-status.bash")
+    - name: Update commit status
+      shell: bash
+      env:
+        GITHUB_TOKEN: ${{ inputs.github-token }}
+        TARGET_URL: ${{ inputs.target-url }}
+        COMMIT_STATUS_SHA: ${{ inputs.sha }}
+        DESCRIPTION: ${{ steps.commit_status.outputs.description }}
+        CONTEXT: ${{ inputs.context }}
+        STATUS: ${{ steps.commit_status.outputs.status }}
+      run: |
+        @import ../script-import-helper (script_name: "update-commit-status.bash")
