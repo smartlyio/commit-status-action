@@ -27,7 +27,7 @@ runs:
       id: commit_status_sha
       shell: bash
       run: |
-        @import script-import-helper (script_name: "get-commit-sha.bash")
+        @import ../script-import-helper (script_name: "get-commit-sha.bash")
     - name: Create commit status
       shell: bash
       env:
@@ -37,4 +37,4 @@ runs:
         DESCRIPTION: ${{ inputs.description }}
         CONTEXT: ${{ inputs.context }}
       run: |
-        @import script-import-helper (script_name: "create-commit-status.bash")
+        @import ../script-import-helper (script_name: "create-commit-status.bash")

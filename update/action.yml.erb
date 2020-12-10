@@ -25,7 +25,7 @@ runs:
       id: commit_status
       shell: bash
       run: |
-        @import script-import-helper (script_name: "get-commit-status.bash")
+        @import ../script-import-helper (script_name: "get-commit-status.bash")
     - name: Update commit status
       shell: bash
         GITHUB_TOKEN: ${{ inputs.github-token }}
@@ -35,4 +35,4 @@ runs:
         CONTEXT: ${{ inputs.context }}
         STATUS: ${{ steps.commit_status.outputs.status }}
       run: |
-        @import script-import-helper (script_name: "update-commit-status.bash")
+        @import ../script-import-helper (script_name: "update-commit-status.bash")
