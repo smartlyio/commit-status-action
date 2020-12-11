@@ -6,9 +6,11 @@ EOFNEEDS
 
 function countbyStatus() {
   local status="$1"
+  local with_status=
   local count=0
-  jq '. | with_entries(select(.value.result == "'"$status"'"))' <update_commit_status-needs.json 1>&2
-  count="$(jq '. | with_entries(select(.value.result == "'"$status"'")) | length' <update_commit_status-needs.json)"
+  with_status="$(jq '. | with_entries(select(.value.result == "'"$status"'"))' <update_commit_status-needs.json)"
+  echo "$with_status" 1>&2
+  count="$(echo "$with_status" | jq '. | length')"
   echo "$count"
 }
 function jobsWithStatus() {
