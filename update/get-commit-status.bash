@@ -4,6 +4,11 @@ cat > update_commit_status-needs.json <<EOFNEEDS
 ${GITHUB_NEEDS}
 EOFNEEDS
 
+ERROR=error
+CANCELLED=cancelled
+FAILURE=failure
+SUCCESS=success
+
 function countbyStatus() {
   local status="$1"
   local with_status=
@@ -20,20 +25,20 @@ function jobsWithStatus() {
 function jobsStatuses() {
     jq -r '. | to_entries | .[] | .key + ": " .value.result' <update_commit_status-needs.json | tr $'\n' '; ' | sed 's/; $//'
 }
-successes="$(countbyStatus "success")"
-failures="$(countbyStatus "failure")"
-cancelled="$(countbyStatus "cancelled")"
+successes="$(countbyStatus "$SUCCESS")"
+failures="$(countbyStatus "$FAILURE")"
+cancelled="$(countbyStatus "$CANCELLED")"
 if [[ "$cancelled" -gt 0 ]]; then
-  final_result="error"
-  description="Build ended as 'error' with one or more cancelled stages: $(jobsWithStatus "cancelled")"
+  final_result="$ERROR"
+  description="Build ended as 'error' with one or more cancelled stages: $(jobsWithStatus "$CANCELLED")"
 elif [[ "$failures" -gt 0 ]]; then
-  final_result="failure"
-  description="Build ended as 'failed' with one or more failed stages: $(jobsWithStatus "failure")"
+  final_result="$FAILURE"
+  description="Build ended as 'failed' with one or more failed stages: $(jobsWithStatus "$FAILURE")"
 elif [[ "$successes" -eq 0 ]]; then
-  final_result="error"
+  final_result="$ERROR"
   description="Build encountered unknown error with no successful stages reported. Job statuses are $(jobsStatuses)"
 else
-  final_result="success"
+  final_result="$SUCCESS"
   description="Build succeeded"
 fi
 echo ::set-output name=status::"$final_result"
