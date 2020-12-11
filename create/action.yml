@@ -24,6 +24,8 @@ runs:
       id: commit_status_sha
       shell: bash
       run: |
+        set -eu -o pipefail
+        
         if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
           SHA="${{ github.event.pull_request.head.sha }}"
         else
@@ -40,6 +42,8 @@ runs:
         DESCRIPTION: "Build status is pending"
         CONTEXT: ${{ inputs.context }}
       run: |
+        set -eu -o pipefail
+        
         declare -a ARGS
         if [[ -n "$TARGET_URL" ]]; then
             ARGS=("-f" "target_url=${TARGET_URL}")
