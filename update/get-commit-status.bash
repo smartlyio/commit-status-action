@@ -1,3 +1,5 @@
+set -eu -o pipefail
+
 cat > update_commit_status-needs.json <<EOFNEEDS
 ${GITHUB_NEEDS}
 EOFNEEDS
