@@ -1,3 +1,5 @@
+set -eu -o pipefail
+
 declare -a ARGS
 if [[ -n "$TARGET_URL" ]]; then
     ARGS=("-f" "target_url=${TARGET_URL}")
