@@ -41,5 +41,5 @@ else
   final_result="$SUCCESS"
   description="Build succeeded"
 fi
-echo ::set-output name=status::"$final_result"
-echo ::set-output name=description::"$description"
+echo status="$final_result" >> "$GITHUB_OUTPUT"
+echo description="$description" >> "$GITHUB_OUTPUT"

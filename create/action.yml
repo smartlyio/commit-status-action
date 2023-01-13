@@ -25,13 +25,13 @@ runs:
       shell: bash
       run: |
         set -eu -o pipefail
-        
+
         if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
           SHA="${{ github.event.pull_request.head.sha }}"
         else
           SHA="${{ github.sha }}"
         fi
-        echo ::set-output name=sha::"$SHA"
+        echo sha="$SHA" >> "$GITHUB_OUTPUT"
 
     - name: Create commit status
       shell: bash
@@ -43,12 +43,12 @@ runs:
         CONTEXT: ${{ inputs.context }}
       run: |
         set -eu -o pipefail
-        
+
         declare -a ARGS
         if [[ -n "$TARGET_URL" ]]; then
             ARGS=("-f" "target_url=${TARGET_URL}")
         fi
-        
+
         gh api "/repos/${GITHUB_REPOSITORY}/statuses/${COMMIT_STATUS_SHA}" \
            -X POST \
            -f state=pending \
