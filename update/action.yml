@@ -34,16 +34,16 @@ runs:
         GITHUB_NEEDS: ${{ inputs.github-needs }}
       run: |
         set -eu -o pipefail
-        
+
         cat > update_commit_status-needs.json <<EOFNEEDS
         ${GITHUB_NEEDS}
         EOFNEEDS
-        
+
         ERROR=error
         CANCELLED=cancelled
         FAILURE=failure
         SUCCESS=success
-        
+
         function countbyStatus() {
           local status="$1"
           local with_status=
@@ -76,8 +76,8 @@ runs:
           final_result="$SUCCESS"
           description="Build succeeded"
         fi
-        echo ::set-output name=status::"$final_result"
-        echo ::set-output name=description::"$description"
+        echo status="$final_result" >> "$GITHUB_OUTPUT"
+        echo description="$description" >> "$GITHUB_OUTPUT"
 
     - name: Update commit status
       shell: bash
@@ -90,12 +90,12 @@ runs:
         STATUS: ${{ steps.commit_status.outputs.status }}
       run: |
         set -eu -o pipefail
-        
+
         declare -a ARGS
         if [[ -n "$TARGET_URL" ]]; then
             ARGS=("-f" "target_url=${TARGET_URL}")
         fi
-        
+
         gh api "/repos/${GITHUB_REPOSITORY}/statuses/${COMMIT_STATUS_SHA}" \
            -XPOST \
            -f state="$STATUS" \

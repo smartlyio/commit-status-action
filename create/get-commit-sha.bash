@@ -5,4 +5,4 @@ if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
 else
   SHA="${{ github.sha }}"
 fi
-echo ::set-output name=sha::"$SHA"
+echo sha="$SHA" >> "$GITHUB_OUTPUT"
