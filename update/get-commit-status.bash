@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -eu -o pipefail
 
 cat > update_commit_status-needs.json <<EOFNEEDS

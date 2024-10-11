@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 set -eu -o pipefail
 
 if [ -n "$COMMIT_STATUS_SHA" ]; then
