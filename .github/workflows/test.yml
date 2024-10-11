@@ -21,7 +21,7 @@ jobs:
 
   shellcheck:
     # Use newer os for more up-to-date shellcheck
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - name: Run shellcheck on .sh and .bash files files
@@ -35,7 +35,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: ruby/setup-ruby@v1
         with:
-          ruby-version: "2.7"
+          ruby-version: "3.2"
       - name: Install kojo
         run: gem install kojo
       - run: make
