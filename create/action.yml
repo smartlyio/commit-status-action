@@ -42,4 +42,4 @@ runs:
         DESCRIPTION: "Build status is pending"
         CONTEXT: ${{ inputs.context }}
       run: |
-        "${GITHUB_ACTION_PATH}/"create-commit-status.bash"
+        "${GITHUB_ACTION_PATH}/create-commit-status.bash"
