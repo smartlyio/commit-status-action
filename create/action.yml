@@ -11,6 +11,10 @@ inputs:
   target-url:
     description: "URL to include in the status"
     default: "https://github.com/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+  sha:
+    description: "Commit sha to attach the status to if it's different from the workflow run commit"
+    required: false
+    default: ""
 
 outputs:
   commit_status_sha:
@@ -23,16 +27,12 @@ runs:
     - name: Determine commit to put the build status on
       id: commit_status_sha
       shell: bash
+      env:
+        COMMIT_STATUS_SHA: ${{ inputs.sha }}
+        PULL_REQUEST_SHA: ${{ github.event.pull_request.head.sha }}
+        GITHUB_SHA: ${{ github.sha }}
       run: |
-        set -eu -o pipefail
-
-        if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-          SHA="${{ github.event.pull_request.head.sha }}"
-        else
-          SHA="${{ github.sha }}"
-        fi
-        echo sha="$SHA" >> "$GITHUB_OUTPUT"
-
+        "${GITHUB_ACTION_PATH}/get-commit-sha.bash"
     - name: Create commit status
       shell: bash
       env:
@@ -42,16 +42,4 @@ runs:
         DESCRIPTION: "Build status is pending"
         CONTEXT: ${{ inputs.context }}
       run: |
-        set -eu -o pipefail
-
-        declare -a ARGS
-        if [[ -n "$TARGET_URL" ]]; then
-            ARGS=("-f" "target_url=${TARGET_URL}")
-        fi
-
-        gh api "/repos/${GITHUB_REPOSITORY}/statuses/${COMMIT_STATUS_SHA}" \
-           -X POST \
-           -f state=pending \
-           -f description="$DESCRIPTION" \
-           -f context="$CONTEXT" \
-           "${ARGS[@]}"
+        "${GITHUB_ACTION_PATH}/create-commit-status.bash"

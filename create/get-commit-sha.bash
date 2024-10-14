@@ -1,8 +1,12 @@
+#!/usr/bin/env bash
+
 set -eu -o pipefail
 
-if [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
-  SHA="${{ github.event.pull_request.head.sha }}"
+if [ -n "$COMMIT_STATUS_SHA" ]; then
+  SHA="$COMMIT_STATUS_SHA"
+elif [[ "$GITHUB_EVENT_NAME" == "pull_request" ]]; then
+  SHA="$PULL_REQUEST_SHA"
 else
-  SHA="${{ github.sha }}"
+  SHA="$GITHUB_SHA"
 fi
 echo sha="$SHA" >> "$GITHUB_OUTPUT"
