@@ -12,7 +12,7 @@ jobs:
     outputs:
       sha: ${{ steps.commit_status.outputs.commit_status_sha }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Create pending status
         id: commit_status
         uses: ./create
@@ -23,7 +23,7 @@ jobs:
     # Use newer os for more up-to-date shellcheck
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Run shellcheck on .sh and .bash files files
         run: |
           find . -name '*.sh' -exec shellcheck -s bash '{}' \+
@@ -34,7 +34,7 @@ jobs:
     needs: [shellcheck, create_status]
     if: ${{ always() }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Update commit status
         uses: ./update
         with:
