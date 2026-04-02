@@ -1,6 +1,6 @@
 {
   "extends": [
-    "config:base"
+    "config:best-practices"
   ],
   "vulnerabilityAlerts": {
     "enabled": true
@@ -12,5 +12,6 @@
       "renovate-deps"
     ],
     "automerge": true
-  }
+  },
+  "minimumReleaseAge": "30 days"
 }
