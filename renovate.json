@@ -13,5 +13,15 @@
     ],
     "automerge": true
   },
-  "minimumReleaseAge": "30 days"
+  "minimumReleaseAge": "30 days",
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest"
+      ],
+      "minimumReleaseAge": null,
+      "automerge": true
+    }
+  ]
 }
