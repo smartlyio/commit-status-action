@@ -1,6 +1,6 @@
 {
   "extends": [
-"config:recommended"
+    "config:best-practices"
   ],
   "vulnerabilityAlerts": {
     "enabled": true
@@ -12,5 +12,16 @@
       "renovate-deps"
     ],
     "automerge": true
-  }
+  },
+  "minimumReleaseAge": "30 days",
+  "packageRules": [
+    {
+      "matchUpdateTypes": [
+        "pin",
+        "pinDigest"
+      ],
+      "minimumReleaseAge": null,
+      "automerge": true
+    }
+  ]
 }
